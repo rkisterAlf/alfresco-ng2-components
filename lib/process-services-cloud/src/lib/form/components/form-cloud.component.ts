@@ -116,6 +116,23 @@ export class FormCloudComponent extends FormBaseComponent implements OnChanges, 
             .subscribe((content) => {
                 this.formContentClicked.emit(content);
             });
+
+        this.formService.formFieldValueChanged
+            .pipe(takeUntil(this.onDestroy$))
+            .subscribe((formFieldEvent) => {
+                if (formFieldEvent.field.fieldType === 'uppload' && formFieldEvent.field.params.retrieveMetadata) {
+                    const metadata = formFieldEvent.field.value?.properties;
+                    if (metadata) {
+                        const keys = Object.keys(metadata);
+                        keys.forEach(key => {
+                            if (!(key in this.data)) {
+                                this.data[key] = metadata[key];
+                            }
+                        });
+                        this.refreshFormData();
+                    }
+                }
+            });
     }
 
     ngOnChanges(changes: SimpleChanges) {
