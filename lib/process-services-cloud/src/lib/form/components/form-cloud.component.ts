@@ -120,13 +120,14 @@ export class FormCloudComponent extends FormBaseComponent implements OnChanges, 
         this.formService.formFieldValueChanged
             .pipe(takeUntil(this.onDestroy$))
             .subscribe((formFieldEvent) => {
-                if (formFieldEvent.field.fieldType === 'uppload' && formFieldEvent.field.params.retrieveMetadata) {
+                if (formFieldEvent.field.fieldType === 'upload' && formFieldEvent.field.params.retrieveMetadata) {
                     const metadata = formFieldEvent.field.value?.properties;
                     if (metadata) {
                         const keys = Object.keys(metadata);
                         keys.forEach(key => {
-                            if (!(key in this.data)) {
-                                this.data[key] = metadata[key];
+                            const sanitizedKey = key.replace('_', ':');
+                            if (!(sanitizedKey in this.data)) {
+                                this.data[sanitizedKey] = metadata[key];
                             }
                         });
                         this.refreshFormData();
